@@ -156,6 +156,19 @@
 
   <footer>
     © 2025 zer0matt. All rights reserved.  
+	<br>
+    <span id="visits"></span>
   </footer>
+  
+  <script>
+  fetch('https://api.countapi.xyz/hit/zer0matt.github.io/global')
+    .then(response => response.json())
+    .then(data => {
+      const el = document.getElementById('visits');
+      if (el) el.innerText = "Total visits: " + data.value;
+    });
+  </script>
+
+  
 </body>
 </html>
