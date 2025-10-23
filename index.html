@@ -155,19 +155,14 @@
 </main>
 
   <footer>
-    © 2025 zer0matt. All rights reserved.  
-	<br>
-	<p id="visits"></p>
+  © 2025 zer0matt. All rights reserved.
+  <br>
+  <!-- Contatore visitatori globale -->
+  <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fzer0matt.github.io&count_bg=%2379C83D&title_bg=%23555555&icon=github.svg&icon_color=%23E7E7E7&title=visits&edge_flat=false" 
+       alt="Visit counter" 
+       style="margin-top: 0.5rem; display: inline-block;">
   </footer>
-  
-  <script>
-  fetch('https://api.countapi.xyz/hit/zer0matt.github.io/global')
-    .then(response => response.json())
-    .then(data => {
-      const el = document.getElementById('visits');
-      if (el) el.innerText = "Total visits: " + data.value;
-    });
-  </script>
+
 
   
 </body>
