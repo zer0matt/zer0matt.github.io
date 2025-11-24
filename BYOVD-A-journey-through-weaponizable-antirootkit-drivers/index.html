@@ -142,13 +142,12 @@
 	  <p>Approaching to Kernel exploitation can often leads to serious headache, there are nowadays so many protection mechanisms that are setup which try to prevent any serious issue with Kernel structures (e.g.: Patchguard).</p>
 	  <p>We can start by looking up for drivers vulnerabilities since they offer ring-0 services that, if exploited, can allow us to delve into kernel-space, which eventually leads to a serious OS compromission.</p>
 	  <p>Abusing kernel drivers’ vulnerabilities means we’re in kernel-land now, we can almost do anything such as disable DSE (Driver Signature Enforcement) and load our own malicious drivers, disable PPL (Protected Process Light) in order to dump lsass.exe, disable EDR, etc.</p>
-	  <p>If you’re pretty new with kernel exploitation and want to start to understand how to abuse drivers to gain kernel-mode privileges I honestly feel to suggest https://github.com/hacksysteam/HackSysExtremeVulnerableDriver.</p>
+	  <p>If you’re pretty new with kernel exploitation and want to start to understand how to abuse drivers to gain kernel-mode privileges I honestly feel to suggest <a href="https://github.com/hacksysteam/HackSysExtremeVulnerableDriver" target="_blank">https://github.com/hacksysteam/HackSysExtremeVulnerableDriver</a>.</p>
 	</section>
 
     <section>
       <h2>Introduction</h2>
-      <p>I always found fascinating how anti-rootkits can be considered a double-edged sword</p>
-	  <p>Usually, assigning such high privileges to an important component such as anti-rootkits can be a double-edged sword.</p>
+      <p>I always found fascinating how anti-rootkits can be considered a double-edged sword.</p>
 	  <p>While it is right to give such high privileges given the insidious nature of rootkits, it can be risky and may prove counterproductive or even dangerous for the end user.</p>
 	  <p>A typical example of a weaponized anti-rootkit designed to kill arbitrary processes is gmer.sys.</p>
 	  <p>For this article, I wanted to provide something to investigate from scratch, so I chose the awsArPot.sys driver from Avast AV.</p>
