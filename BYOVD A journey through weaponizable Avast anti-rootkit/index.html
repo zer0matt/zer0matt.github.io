@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CVE-2025-60751 | zer0matt's blog</title>
+  <meta name="description" content="Avast anti-rootkit driver.">
+  <link rel="icon" href="https://github.githubassets.com/favicons/favicon.svg">
+  <style>
+    :root {
+      --bg: #fafafa;
+      --text: #222;
+      --link: #0366d6;
+      --link-hover: #023e8a;
+      --heading: #111;
+      --muted: #666;
+      --border: #e5e5e5;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Consolas, "Lucida Console", monospace;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      text-align: center;
+      padding: 2.5rem 1rem 1rem;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--heading);
+    }
+
+    nav {
+      margin-top: 1rem;
+    }
+
+    nav a {
+      margin: 0 0.8rem;
+      color: var(--link);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    nav a:hover {
+      color: var(--link-hover);
+    }
+
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 3rem 1rem 4rem;
+    }
+
+    section {
+      margin-bottom: 2rem;
+    }
+
+    section h2 {
+      font-size: 1.5rem;
+      color: var(--heading);
+      margin-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.3rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: var(--link-hover);
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #e5e5e5;
+      color: #111;
+      font-weight: 500;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.4rem;
+      margin-right: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    /* Snippet code box */
+    .pre-block {
+      background: #f7f7f8;
+      color: #111;
+      padding: 1rem;
+      border-radius: 6px;
+      border: 1px solid #e6e6e6;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Helvetica Neue", monospace;
+      font-size: 0.92rem;
+      line-height: 1.45;
+      white-space: pre;
+      overflow: auto;      /* scroll both horizontally and vertically */
+      max-height: 60vh;    /* vertical scroll when content is tall */
+      word-break: normal;
+    }
+
+    .pre-block:hover {
+      box-shadow: 0 6px 24px rgba(0,0,0,0.06);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CVE-2025-60751 – GeographicLib Stack Buffer Overflow</h1>
+    <nav>
+      <a href="https://zer0matt.github.io/">Home</a>
+      <a href="https://zer0matt.github.io/about/">About</a>
+      <a href="https://zer0matt.github.io/vulnerability/">Vulnerabilities</a>
+      <a href="https://github.com/zer0matt" target="_blank">GitHub</a>
+      <a href="https://www.linkedin.com/in/rosario-matteo-grammatico/" target="_blank">Linkedin</a>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>Overview</h2>
+	  <p>Approaching to Kernel exploitation can often leads to serious headache, there are nowadays so many protection mechanisms that are setup which try to prevent any serious issue with Kernel structures (e.g.: Patchguard).</p>
+	  <p>We can start by looking up for drivers vulnerabilities since they offer ring-0 services that, if exploited, can allow us to delve into kernel-space, which eventually leads to a serious OS compromission.</p>
+	  <p>Abusing kernel drivers’ vulnerabilities means we’re in kernel-land now, we can almost do anything such as disable DSE (Driver Signature Enforcement) and load our own malicious drivers, disable PPL (Protected Process Light) in order to dump lsass.exe, disable EDR, etc.</p>
+	  <p>If you’re pretty new with kernel exploitation and want to start to understand how to abuse drivers to gain kernel-mode privileges I honestly feel to suggest https://github.com/hacksysteam/HackSysExtremeVulnerableDriver.</p>
+	</section>
+
+    <section>
+      <h2>Introduction</h2>
+      <p>I always found fascinating how anti-rootkits can be considered a double-edged sword</p>
+	  <p>Usually, assigning such high privileges to an important component such as anti-rootkits can be a double-edged sword.</p>
+	  <p>While it is right to give such high privileges given the insidious nature of rootkits, it can be risky and may prove counterproductive or even dangerous for the end user.</p>
+	  <p>A typical example of a weaponized anti-rootkit designed to kill arbitrary processes is gmer.sys.</p>
+	  <p>For this article, I wanted to provide something to investigate from scratch, so I chose the awsArPot.sys driver from Avast AV.</p>
+	  <p>I will illustrate the work done step by step to give a clear overview even to those who are approaching this field for the first time.</p>
+	  <p>Please note: I am not an expert in kernel exploitation. This article is the result of my research and efforts to learn new things, so please forgive me if some of what I write is not 100% correct.</p>
+    </section>
+	<section>
+	  <h2>Technical analysis</h2>
+	  <p>First thing first, after deciding which driver provides anti-rootkit functionalities (check for ZwOpenProcess/NtOpenProcess and ZwTerminateProcess/NtTerminateProcess)</p>
+	  <p>After checking drivers of the Avast AV, aswArPot.sys seems to be the one that provides anti-rootkit functionalities.</p>
+	  <p>Once we have identified the driver, we use IDA (or Ghidra) to reverse engineer it.</p>
+	  <p>Drivers have a “main function” called DriverEntry. With IDA, it is possible to decompile and analyze the pseudocode of the driver entry, thus obtaining pseudocode similar to C/C++ that allows us to better understand which instructions are executed in the code.</p>
+	  <p>From DriverEntry, we scroll through the program in the various calls until we reach the function where ZwTerminateProcess is called.</p>
+	  <p>
+	  <img src="1.png" alt="aswarpotdriver" style="display:block; margin:0 auto; max-width:100%;">
+	  </p>
+	  <p>So the function that calls ZwTerminateProcess is sub_1400282E0, we'll take note on that.</p>
+	  <p>IDA offers us a cool functionality that allows us to see in a graph view where functions are being called from.</p>
+	  <img src="2.png" alt="aswarpotdriver" style="display:block; margin:0 auto; max-width:100%;">
+	</section>
+	
+	<section>
+      <h2>References & Resources</h2>
+      <ul>
+        <li><a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-60751" target="_blank">CVE-2025-60751</a></li>
+        <li><a href="https://github.com/zer0matt/CVE-2025-60751" target="_blank">GitHub – zer0matt's CVE-2025-60751 Proof of Concept</a></li>
+        <li><a href="https://github.com/geographiclib/geographiclib/issues/43" target="_blank">GitHub – Issue</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    © 2025 zer0matt. All rights reserved.
+  </footer>
+
+</body>
+</html>
