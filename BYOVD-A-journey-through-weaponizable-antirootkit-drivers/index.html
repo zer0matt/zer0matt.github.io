@@ -143,6 +143,9 @@
 	  <p>We can start by looking up for drivers vulnerabilities since they offer ring-0 services that, if exploited, can allow us to delve into kernel-space, which eventually leads to a serious OS compromission.</p>
 	  <p>Abusing kernel drivers’ vulnerabilities means we’re in kernel-land now, we can almost do anything such as disable DSE (Driver Signature Enforcement) and load our own malicious drivers, disable PPL (Protected Process Light) in order to dump lsass.exe, disable EDR, etc.</p>
 	  <p>If you’re pretty new with kernel exploitation and want to start to understand how to abuse drivers to gain kernel-mode privileges I honestly feel to suggest <a href="https://github.com/hacksysteam/HackSysExtremeVulnerableDriver" target="_blank">https://github.com/hacksysteam/HackSysExtremeVulnerableDriver</a>.</p>
+	  <p>To be fair a bit of context is needed: if you are new to driver exploitation you must know that a driver is allowed to take as input specific IOCTL (Input/Output control codes) that triggers specific functionalities.</p>
+	  <p>Usually, it's possible to use (and abuse) those IOCTL codes because they're the form of communication between an application (user-land) and the driver (kernel-land)</p>
+	  <p>But that's not all. In fact, to establish such communication channel between user-land and kernel-land you need also an exposed symbolic link which is usually found under \Device or \DosDevices (if you use winobj you can visualize it pretty fast).</p>
 	</section>
 
     <section>
@@ -156,7 +159,7 @@
     </section>
 	<section>
 	  <h2>Technical analysis</h2>
-	  <p>First thing first, after deciding which driver provides anti-rootkit functionalities (check for ZwOpenProcess/NtOpenProcess and ZwTerminateProcess/NtTerminateProcess)</p>
+	  <p>First thing first, after deciding which driver provides anti-rootkit functionalities (check for ZwOpenProcess/NtOpenProcess and ZwTerminateProcess/NtTerminateProcess).</p>
 	  <p>After checking drivers of the Avast AV, aswArPot.sys seems to be the one that provides anti-rootkit functionalities.</p>
 	  <p>Once we have identified the driver, we use IDA (or Ghidra) to reverse engineer it.</p>
 	  <p>Drivers have a “main function” called DriverEntry. With IDA, it is possible to decompile and analyze the pseudocode of the driver entry, thus obtaining pseudocode similar to C/C++ that allows us to better understand which instructions are executed in the code.</p>
@@ -167,6 +170,10 @@
 	  <p>So the function that calls ZwTerminateProcess is sub_1400282E0, we'll take note on that.</p>
 	  <p>IDA offers us a cool functionality that allows us to see in a graph view where functions are being called from.</p>
 	  <img src="2.png" alt="aswarpotdriver" style="display:block; margin:0 auto; max-width:100%;">
+	  <p>Nevertheless, we have found the ioctl dispatcher located into the sub_140023238 function, as showed in the pic below.</p>
+	  <img src="3.png" alt="aswarpotdriver" style="display:block; margin:0 auto; max-width:100%;">
+	  <p>Great! Now we know the ioctl that triggers this behaviour.</p>
+	  <p>I have to admit it. I was stucked for a couple of days because I couldn't find an exposed symlink that suggested me ring-3 to ring-0 communication.</p>
 	</section>
 	
 	<section>
