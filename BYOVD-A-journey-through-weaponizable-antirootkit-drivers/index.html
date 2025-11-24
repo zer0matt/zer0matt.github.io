@@ -174,9 +174,16 @@
 	  <img src="3.png" alt="aswarpotdriver3" style="display:block; margin:0 auto; max-width:100%;">
 	  <p>Great! Now we know the ioctl that triggers this behaviour. It's time to find the symbolic link exposed!</p>
 	  <p>I have to admit it. I was stucked for a couple of days because I couldn't find an exposed symlink.</p>
-	  <p>After struggling a little bit deeper inside the reversed pseudocode (and checking IoCreateSymlink function on the imports table) I found a perfect candidate: 
-	  aswSP_AVar.
+	  <p>After struggling a little bit deeper inside the reversed pseudocode (and checking IoCreateSymlink function on the imports table) I found a perfect candidate: aswSP_Avar.
 	  <img src="4.png" alt="aswarpotdriver4" style="display:block; margin:0 auto; max-width:100%;">
+	  </p>
+	  <p>
+	  That was a great news after I spent the whole weekend reversing this driver.
+	  So I try to run a little C++ program to open a handle to such device and...Error 50: ERROR_NOT_SUPPORTED.
+	  </p>
+	  <p>Mmm...that's strange. It should at least let me open a handle but something is not right.
+	  I decide to investigate further and suddenly I find myself this snippet of code:
+	  <img src="5.png" alt="aswarpotdriver4" style="display:block; margin:0 auto; max-width:100%;">
 	  </p>
 	</section>
 	
