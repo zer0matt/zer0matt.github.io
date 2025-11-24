@@ -165,15 +165,19 @@
 	  <p>Drivers have a “main function” called DriverEntry. With IDA, it is possible to decompile and analyze the pseudocode of the driver entry, thus obtaining pseudocode similar to C/C++ that allows us to better understand which instructions are executed in the code.</p>
 	  <p>From DriverEntry, we scroll through the program in the various calls until we reach the function where ZwTerminateProcess is called.</p>
 	  <p>
-	  <img src="1.png" alt="aswarpotdriver" style="display:block; margin:0 auto; max-width:100%;">
+	  <img src="1.png" alt="aswarpotdriver1" style="display:block; margin:0 auto; max-width:100%;">
 	  </p>
 	  <p>So the function that calls ZwTerminateProcess is sub_1400282E0, we'll take note on that.</p>
 	  <p>IDA offers us a cool functionality that allows us to see in a graph view where functions are being called from.</p>
-	  <img src="2.png" alt="aswarpotdriver" style="display:block; margin:0 auto; max-width:100%;">
+	  <img src="2.png" alt="aswarpotdriver2" style="display:block; margin:0 auto; max-width:100%;">
 	  <p>Nevertheless, we have found the ioctl dispatcher located into the sub_140023238 function, as showed in the pic below.</p>
-	  <img src="3.png" alt="aswarpotdriver" style="display:block; margin:0 auto; max-width:100%;">
-	  <p>Great! Now we know the ioctl that triggers this behaviour.</p>
-	  <p>I have to admit it. I was stucked for a couple of days because I couldn't find an exposed symlink that suggested me ring-3 to ring-0 communication.</p>
+	  <img src="3.png" alt="aswarpotdriver3" style="display:block; margin:0 auto; max-width:100%;">
+	  <p>Great! Now we know the ioctl that triggers this behaviour. It's time to find the symbolic link exposed!</p>
+	  <p>I have to admit it. I was stucked for a couple of days because I couldn't find an exposed symlink.</p>
+	  <p>After struggling a little bit deeper inside the reversed pseudocode (and checking IoCreateSymlink function on the imports table) I found a perfect candidate: 
+	  aswSP_AVar.
+	  <img src="4.png" alt="aswarpotdriver4" style="display:block; margin:0 auto; max-width:100%;">
+	  </p>
 	</section>
 	
 	<section>
