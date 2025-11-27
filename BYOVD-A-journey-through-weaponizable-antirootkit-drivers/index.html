@@ -152,7 +152,7 @@
       <h2>Introduction</h2>
       <p>I’ve always found it fascinating how anti-rootkits can act as a double-edged sword.
 	  While granting them high privileges makes sense given the stealthy nature of rootkits, this level of access can also be risky and, in some cases, even counterproductive or dangerous for the end user.
-	  A well-known example of how an anti-rootkit component can be turned into a weaponized tool is aswArPot.sys, which is capable of terminating arbitrary processes.</p>
+	  A well-known example of how an anti-rootkit component can be turned into a weaponized tool is <b>aswArPot.sys</b>, which is capable of terminating arbitrary processes.</p>
 	  <p>For this article, I wanted to offer something that could be analyzed from scratch, so I picked up the awsArPot.sys driver from Avast AV as a subject of investigation.
 	  I will walk through the work step by step to provide a clear overview, even for readers who are approaching this area for the first time.
 	  Please note: I am not an expert in kernel exploitation. This article reflects my own research and my attempts to learn more about the topic, so forgive me if some details are not perfectly accurate.</p>
@@ -165,7 +165,7 @@
 	  <h2>Technical analysis</h2>
 	  <p>First things first: when evaluating whether a driver can be repurposed for malicious behavior, one typically checks whether it references functions such as ZwOpenProcess/NtOpenProcess and ZwTerminateProcess/NtTerminateProcess.
 	  Their presence can indicate that the driver includes logic for interacting with or terminating processes.</p>
-	  <p>Within the Avast AV driver set, aswArPot.sys appears to be the component responsible for anti-rootkit functionality.</p>
+	  <p>Within the Avast AV driver set, <b>aswArPot.sys</b> appears to be the component responsible for anti-rootkit functionality.</p>
 	  <p>After identifying the driver of interest, the next step is to analyze it with a reverse-engineering tool such as IDA or Ghidra.</p>
 	  <p>Kernel drivers include an entry point known as DriverEntry. Using IDA, it's possible to decompile this entry point and view its pseudocode, which resembles C/C++ and provides a clearer understanding of the logic executed during the driver's initialization.</p>
 	  <p>Starting from DriverEntry, we can follow the call chain through the program until we reach the routine where the driver interacts with process-management functions such as ZwTerminateProcess.</p>
