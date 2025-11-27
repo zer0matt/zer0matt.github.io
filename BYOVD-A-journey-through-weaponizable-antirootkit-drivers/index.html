@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CVE-2025-60751 | zer0matt's blog</title>
+  <title>BYOVD: A journey through weaponizable anti-rootkit drivers | zer0matt's blog</title>
   <meta name="description" content="Avast anti-rootkit driver.">
   <link rel="icon" href="https://github.githubassets.com/favicons/favicon.svg">
   <style>
@@ -126,7 +126,7 @@
 </head>
 <body>
   <header>
-    <h1>BYOVD A journey through weaponizable anti-rootkit drivers</h1>
+    <h1>BYOVD: A journey through weaponizable anti-rootkit drivers</h1>
     <nav>
       <a href="https://zer0matt.github.io/">Home</a>
       <a href="https://zer0matt.github.io/about/">About</a>
@@ -158,6 +158,10 @@
 	  <p>Please note: I am not an expert in kernel exploitation. This article is the result of my research and efforts to learn new things, so please forgive me if some of what I write is not 100% correct.</p>
     </section>
 	<section>
+	  <h2>Target</h2>
+	  <p>The target is to abuse the ZwTerminateProcess syscall in order to kill any process arbitrarily by passing the PID of the target process as a parameter.</p>
+	</section>
+	<section>
 	  <h2>Technical analysis</h2>
 	  <p>First thing first, after deciding which driver provides anti-rootkit functionalities (check for ZwOpenProcess/NtOpenProcess and ZwTerminateProcess/NtTerminateProcess).</p>
 	  <p>After checking drivers of the Avast AV, aswArPot.sys seems to be the one that provides anti-rootkit functionalities.</p>
@@ -184,6 +188,13 @@
 	  <p>Mmm...that's strange. It should at least let me open a handle but something is not right.
 	  I decide to investigate further and suddenly I find myself this snippet of code:
 	  <img src="5.png" alt="aswarpotdriver4" style="display:block; margin:0 auto; max-width:100%;">
+	  </p>
+	  <p>I'm not much skilled when it comes to reading pseudocode but what I could understand here is:</p>
+	  <li>The symlink is generated through pseudo-randomic seed such as XORing bytes with the current date.</li>
+	  <li>The symlink name is a long string formed by those number of characters: 8-4-4-4-12</li>
+	  <p>I ran the Winobjex64 in order to find it and create a handle on it.
+	  By doing so I could finally create an handle and attach to it, but I'm still not able to trigger the ZwTerminateProcess and kill arbitrary process.
+	  
 	  </p>
 	</section>
 	
