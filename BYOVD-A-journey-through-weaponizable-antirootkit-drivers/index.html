@@ -163,11 +163,12 @@
 	</section>
 	<section>
 	  <h2>Technical analysis</h2>
-	  <p>First thing first, in order to weaponize a driver we need to check for ZwOpenProcess/NtOpenProcess and ZwTerminateProcess/NtTerminateProcess. This is important if we want to use the driver to kill arbitrary processes.</p>
-	  <p>After checking drivers of the Avast AV, aswArPot.sys seems to be the one that provides anti-rootkit functionalities.</p>
-	  <p>Once we have identified the driver, we use IDA (or Ghidra) to reverse engineer it.</p>
-	  <p>Drivers have a “main function” called DriverEntry. With IDA, it is possible to decompile and analyze the pseudocode of the driver entry, thus obtaining pseudocode similar to C/C++ that allows us to better understand which instructions are executed in the code.</p>
-	  <p>From DriverEntry, we scroll through the program in the various calls until we reach the function where ZwTerminateProcess is called.</p>
+	  <p>First things first: when evaluating whether a driver can be repurposed for malicious behavior, one typically checks whether it references functions such as ZwOpenProcess/NtOpenProcess and ZwTerminateProcess/NtTerminateProcess.
+	  Their presence can indicate that the driver includes logic for interacting with or terminating processes.</p>
+	  <p>Within the Avast AV driver set, aswArPot.sys appears to be the component responsible for anti-rootkit functionality.</p>
+	  <p>After identifying the driver of interest, the next step is to analyze it with a reverse-engineering tool such as IDA or Ghidra.</p>
+	  <p>Kernel drivers include an entry point known as DriverEntry. Using IDA, it's possible to decompile this entry point and view its pseudocode, which resembles C/C++ and provides a clearer understanding of the logic executed during the driver's initialization.</p>
+	  <p>Starting from DriverEntry, we can follow the call chain through the program until we reach the routine where the driver interacts with process-management functions such as ZwTerminateProcess.</p>
 	  <p>
 	  <img src="1.png" alt="aswarpotdriver1" style="display:block; margin:0 auto; max-width:100%;">
 	  </p>
