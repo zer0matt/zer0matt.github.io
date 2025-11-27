@@ -172,14 +172,14 @@
 	  <p>
 	  <img src="1.png" alt="aswarpotdriver1" style="display:block; margin:0 auto; max-width:100%;">
 	  </p>
-	  <p>So the function that calls ZwTerminateProcess is sub_1400282E0, we'll take note on that.</p>
+	  <p>So the function that calls ZwTerminateProcess is <b>sub_1400282E0</b>, we'll take note on that.</p>
 	  <p>IDA offers us a cool functionality that allows us to see in a graph view where functions are being called from.</p>
 	  <img src="2.png" alt="aswarpotdriver2" style="display:block; margin:0 auto; max-width:100%;">
-	  <p>Nevertheless, we have found the ioctl dispatcher located into the sub_140023238 function, as showed in the pic below.</p>
+	  <p>Nevertheless, we have found the ioctl dispatcher located into the <b>sub_140023238</b> function, as showed in the pic below.</p>
 	  <img src="3.png" alt="aswarpotdriver3" style="display:block; margin:0 auto; max-width:100%;">
 	  <p>Great! Now we know the ioctl that triggers this behaviour. It's time to find the symbolic link exposed!</p>
-	  <p>I have to admit it. I was stucked for a couple of days because I couldn't find an exposed symlink.</p>
-	  <p>After struggling a little bit deeper inside the reversed pseudocode (and checking IoCreateSymlink function on the imports table) I found a perfect candidate: aswSP_Avar.
+	  <p>I have to admit it, I was stucked for a couple of days because I couldn't find an exposed symlink.</p>
+	  <p>After struggling a little bit deeper inside the reversed pseudocode (check IoCreateSymlink function on the imports table) I found a potential candidate: <b>aswSP_Avar</b>.
 	  <img src="4.png" alt="aswarpotdriver4" style="display:block; margin:0 auto; max-width:100%;">
 	  </p>
 	  <p>
@@ -187,18 +187,17 @@
 	  So I try to run a little C++ program to open a handle to such device and...Error 50: ERROR_NOT_SUPPORTED.
 	  </p>
 	  <p>Mmm...that's strange. It should at least let me open a handle but something is not right.
-	  I decide to investigate further and suddenly I find myself this snippet of code:
-	  <img src="5.png" alt="aswarpotdriver4" style="display:block; margin:0 auto; max-width:100%;">
-	  </p>
-	  <p>I'm not much skilled when it comes to reading pseudocode but what I could understand here is:</p>
-	  <li>The symlink is generated through pseudo-randomic seed such as XORing bytes with the current date.</li>
-	  <li>The symlink name is a long string formed by those number of characters: 8-4-4-4-12</li>
-	  <p>I ran the Winobjex64 in order to find it and create a handle on it.
-	  By doing so I could finally create an handle and attach to it, but I'm still not able to trigger the ZwTerminateProcess and kill arbitrary process.
-	  
-	  </p>
+	  Searching on the web, it appears on this <a href="https://www.trellix.com/blogs/research/when-guardians-become-predators-how-malware-corrupts-the-protectors/" target="_blank">article</a> (that I should have checked before) that I was right about the symlink and IOCTL but seems that is has already been discovered by Trellix researchers and patched by Avast.
+	  <p>
 	</section>
 	
+	<section>
+	  <h2>Conclusion</h2>
+	  <p>
+	  That ends our journey, the target of this article was to illustrate how I did find the "vulnerable" IOCTL and how we could have exploited it in order to build our personal AV Killer (or any arbitrary process killer).
+	  </p>
+	</section>
+	  
 	<section>
       <h2>References & Resources</h2>
       <ul>
