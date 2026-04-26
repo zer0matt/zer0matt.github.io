@@ -134,12 +134,9 @@
 	<!-- PGP Key -->
 	<section>
 	  <h2>PGP Key</h2>
-	  <div style="background: ...; border: 0.5px solid ...; border-radius: 12px; overflow: hidden;">
-  <div style="display: flex; justify-content: space-between; padding: 10px 16px; border-bottom: 0.5px solid ...; background: ...;">
-    <span>PGP public key</span>
-    <button class="copy-code-button" style="" onclick="navigator.clipboard.writeText(document.getElementById('pgpKey').innerText).then(() => { this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy', 2000); })">Copy</button>
-  </div>
-  <pre id="pgpKey">-----BEGIN PGP PUBLIC KEY BLOCK-----
+	  
+	  <div style="position: relative;">
+  <pre style="background: #1e1e1e; color: #d4d4d4; padding: 1rem; border-radius: 8px; overflow-x: auto; font-family: monospace;"><code id="pgpKey">-----BEGIN PGP PUBLIC KEY BLOCK-----
 	  
 
 xjMEaeY5XhYJKwYBBAHaRw8BAQdAZzsEterDf+A+7smZuK8rZb8cbc6q3YKnvNOh
@@ -153,13 +150,10 @@ JWEU0F3ABQJp5jleBQkJZgGAAhsMAAoJEJGoJWEU0F3A8xcBAPg2OMhwISxsPOMn
 WP5FdSPvs8zAkCM6c9tYkjH1Dd8EAP4o6VbU8TmiKALkQDqc8O1yj4jYLLvtSany
 p8iQqAddAw==
 =y4Lx
------END PGP PUBLIC KEY BLOCK-----</pre>
+-----END PGP PUBLIC KEY BLOCK-----
+<button class="copy-code-button" style="position: absolute; top: 8px; right: 8px;" onclick="navigator.clipboard.writeText(document.getElementById('pgpKey').innerText).then(() => { this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy', 2000); })">Copy</button>
 </div>
-<script>
-function copyKey() {
-  navigator.clipboard.writeText(document.getElementById('pgpKey').innerText);
-}
-</script>
+
 	</section>
 	</main>
   <footer>
